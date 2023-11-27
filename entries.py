@@ -1,6 +1,4 @@
-import numpy as np
 from datetime import datetime 
-
 
 all_fruits = [
     'Lemon',
@@ -14,11 +12,34 @@ all_fruits = [
 ]
 
 # function to get the selling date of one recipt
+def get_positive_float(prompt):
+    while True:
+        try:
+            value = float(input(prompt))
+            if value < 0:
+                print("Please enter a positive number.")
+            else:
+                return value
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+def get_positive_int(prompt):
+    while True:
+        try:
+            value = int(input(prompt))
+            if value < 0:
+                print("Please enter a positive number.")
+            else:
+                return value
+        except ValueError:
+            print("Invalid input. Please enter an integer.")
+
+
 def input_date():
     print('Setting Selling Date:')
-    print('------------------------')
-    while True : 
-        date = input('Selling Date (DD-MM-YY):')
+    print('------------------------') 
+    date = input('Selling Date (DD-MM-YY):')
+    while True :
         try:
             user_date = datetime.strptime(date, "%d-%m-%Y")
             print(f"You entered: {user_date}")
@@ -44,14 +65,23 @@ def fruit_category(all_fruits):
  # get the quantity sold for a fruit type in kg and boxes(sanade2)       
 def quantity_sold(user_date , fruit_name):
     print(f'please insert the quantity sold for {fruit_name} according to the following:')
-    quantity_kg = float(input('In kg :'))
-    quantity_box = int(input('In boxes : ')) 
-    average_kg_per_box = quantity_kg/quantity_box
-    print(f"In Average , each box containes {average_kg_per_box}kg")
+    
+    quantity_kg = get_positive_float('In kg: ')
+    quantity_box = get_positive_int('In boxes: ') 
+    if quantity_box == 0:
+        average_kg_per_box = 0
+        print("No boxes sold.")
+    else:
+        average_kg_per_box = quantity_kg / quantity_box
+        print(f"In Average, each box contains {average_kg_per_box:,.2f} kg")
+
     print('Now, for the selling price:')
+    
+    
     dollar_rate = int(input(f'insert the market dollar rate on {user_date}:'))
     price = int(input("price for the quantity sold in Lebanese Pounds (L.L):"))
     price_in_dollar = price / dollar_rate
+    
     if quantity_kg > 0:
         price_per_kg_ll = price / quantity_kg
         price_per_kg_dollar = price_in_dollar / quantity_kg
@@ -67,6 +97,8 @@ def quantity_sold(user_date , fruit_name):
         price_per_box_dollar = 0
         
     entries_summary = {
+        "selling_date" : user_date ,
+        "fruit_name" : fruit_name ,
         "quantity_kg": quantity_kg,
         "quantity_box": quantity_box,
         "average_kg_per_box": average_kg_per_box,
@@ -80,6 +112,7 @@ def quantity_sold(user_date , fruit_name):
     }
     print("Sales Summary:")
     print("---------------")
+    print(f"Selling Date : {entries_summary['selling_date']}")
     print(f"Quantity Sold (kg): {entries_summary['quantity_kg']} kg")
     print(f"Quantity Sold (boxes): {entries_summary['quantity_box']} boxes")
     print(f"Average Weight per Box: {entries_summary['average_kg_per_box']} kg")
@@ -93,6 +126,6 @@ def quantity_sold(user_date , fruit_name):
     return entries_summary
 
 
-date = input_date()
-fruit_name = fruit_category(all_fruits)
-quantities = quantity_sold(date , fruit_name)
+# date = input_date()
+# fruit_name = fruit_category(all_fruits)
+# quantities = quantity_sold(date , fruit_name)
