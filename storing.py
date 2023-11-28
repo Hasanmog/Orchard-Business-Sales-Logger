@@ -1,27 +1,6 @@
 from entries import input_date , fruit_category , quantity_sold
 import sqlite3 
 
-conn = sqlite3.connect('loggings.db')
-cursor = conn.cursor()
-
-create_table = """
-CREATE TABLE IF NOT EXISTS sales(
-    selling_date TEXT , 
-    fruit_name  TEXT ,
-    quantity_kg INTEGER ,
-    quantity_boxes REAL , 
-    average_kg_per_box INTEGER,
-    total_price_ll  INTEGER , 
-    total_price_dollar INTEGER , 
-    price_per_kg_dollar INTEGER,
-    price_per_kg_ll INTEGER,
-    price_per_box_ll INTEGER,
-    price_per_box_dollar Integer
-    )
-"""
-cursor.execute(create_table)
-conn.commit()
-
 all_fruits = [
     'Lemon',
     'Avocado',
@@ -33,44 +12,69 @@ all_fruits = [
     'Orange Shamoute'
 ]
 
+def undo_entry(conn , table_name , entry_id):
+    cursor = conn.cursor()
+    delete = f'''
+    DELETE FROM {table_name} WHERE id = ?
+    '''
+    cursor.execute(delete , (entry_id))
+    conn.commit()
+    
+def delete_table(conn , table_name):
+    
+    cursor = conn.cursor()
+    delete = f'''
+    DROP TABLE {table_name}
+    '''
+    cursor.execute(delete)
+    conn.commit()
 
-def insert_data_db(connection , selling_date ,fruit_name, quantity_kg , quantity_box , average_kg_per_box,
-                    total_price_ll , total_price_dollar , price_per_kg_ll , 
-                   price_per_kg_dollar , price_per_box_ll , price_per_box_dollar):
+def logging(conn , selling_date ,fruit_name , entries):   
+    #explain arguments ....
+    #.......................
+    #connection to database
     
-    # connection = sqlite3.connect('loggings.db')
-    cursor = connection.cursor()
+    cursor = conn.cursor()
     
-    SQL = '''
-    INSERT INTO sales (selling_date, fruit_name, quantity_kg, quantity_boxes, average_kg_per_box,
+    safe_fruit_name = ''.join(char for char in fruit_name if char.isalnum())  # Basic sanitization
+    # It removes any characters from fruit_name that are not alphanumeric.
+    quantity_kg = entries['quantity_kg']
+    quantity_box = entries['quantity_box']
+    average_kg_per_box = entries['average_kg_per_box']
+    total_price_ll = entries['total_price_ll']
+    total_price_dollar = entries['total_price_dollar']
+    price_per_kg_ll = entries['price_per_kg_ll']
+    price_per_kg_dollar = entries['price_per_kg_dollar']
+    price_per_box_ll = entries['price_per_box_ll']
+    price_per_box_dollar = entries['price_per_box_dollar']
+    
+    table = f"""
+    CREATE TABLE IF NOT EXISTS {safe_fruit_name}(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        selling_date TEXT , 
+        quantity_kg INTEGER ,
+        quantity_boxes REAL , 
+        average_kg_per_box INTEGER,
+        total_price_ll  INTEGER , 
+        total_price_dollar INTEGER , 
+        price_per_kg_dollar INTEGER,
+        price_per_kg_ll INTEGER,
+        price_per_box_ll INTEGER,
+        price_per_box_dollar Integer
+    ) 
+    """
+    cursor.execute(table)
+   
+    insert_log = f'''
+    INSERT INTO {safe_fruit_name} (selling_date, quantity_kg, quantity_boxes, average_kg_per_box,
                        total_price_ll, total_price_dollar, price_per_kg_dollar, price_per_kg_ll,
                        price_per_box_ll, price_per_box_dollar)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     '''
-
-    cursor.execute(SQL , (selling_date ,fruit_name, quantity_kg , quantity_box , average_kg_per_box,
-                 total_price_ll , total_price_dollar , price_per_kg_ll , 
-                   price_per_kg_dollar , price_per_box_ll , price_per_box_dollar))
-    connection.commit()
-
-date = input_date()
-fruit_name = fruit_category(all_fruits)
-quantities = quantity_sold(date , fruit_name)
-
-selling_date = quantities['selling_date']
-fruit_name = quantities['fruit_name']
-quantity_kg = quantities['quantity_kg']
-quantity_box = quantities['quantity_box']
-average_kg_per_box = quantities['average_kg_per_box']
-total_price_ll = quantities['total_price_ll']
-total_price_dollar = quantities['total_price_dollar']
-price_per_kg_ll = quantities['price_per_kg_ll']
-price_per_kg_dollar = quantities['price_per_kg_dollar']
-price_per_box_ll = quantities['price_per_box_ll']
-price_per_box_dollar = quantities['price_per_box_dollar']
-
-insert_data_db(conn , selling_date ,fruit_name, quantity_kg , quantity_box , average_kg_per_box,
-                    total_price_ll , total_price_dollar , price_per_kg_ll , 
-                   price_per_kg_dollar , price_per_box_ll , price_per_box_dollar)
-
-conn.close()
+    cursor.execute(insert_log , (selling_date ,quantity_kg , quantity_box , average_kg_per_box,
+                                 total_price_ll, total_price_dollar , price_per_kg_ll,
+                                 price_per_kg_dollar , price_per_box_ll , price_per_box_dollar))
+    conn.commit()
+    
+# conn = sqlite3.connect('loggings.db')
+# delete_table(conn , 'Avocado')
