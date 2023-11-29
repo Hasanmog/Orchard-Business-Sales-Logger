@@ -69,14 +69,13 @@ def forward():
         # Ask if the user wants to undo the last entry
         if input('Undo this entry? (Y/N): ').upper() == 'Y':
             undo_last_entry(conn, date, fruit_name)
-        else:
-            while True:
-                repeat = input('Log another entry on the SAME DATE? (Y/N): ').upper()
-                if repeat in ['Y', 'N']:
-                    break
-                print("Invalid input. Please enter 'Y' for Yes or 'N' for No.")
 
-            while repeat == 'Y':
+        # Repeatedly ask for logging more entries on the same date
+        while True:
+            repeat = input('Log another entry on the SAME DATE? (Y/N): ').upper()
+            if repeat == 'N':
+                break
+            elif repeat == 'Y':
                 fruit_name = fruit_category(all_fruits)
                 entries = quantity_sold(date, fruit_name, repeat, dollar_rate)
                 dollar_rate = entries['dollar_rate']
@@ -85,19 +84,10 @@ def forward():
                 # Ask again for undo after each entry
                 if input('Undo this entry? (Y/N): ').upper() == 'Y':
                     undo_last_entry(conn, date, fruit_name)
-                else:
-                    break
 
         # Check if the user wants to continue logging for a new date
         if input('Do you want to continue logging for a NEW DATE? (Y/N): ').upper() != 'Y':
             break
-        more = 'N'
-        while more != 'N':
-            if input("Is there an entry you would like to remove ? ").upper() == 'Y':
-                fruit_name = input('please insert the fruit name')
-                entry_id = input("please insert the entry id")
-                undo_entry(conn , fruit_name , entry_id)
-                more = input('more ? (Y/N) ')
 
     print("Good job, you've logged your sales.")
     print('Have a nice day :)')
