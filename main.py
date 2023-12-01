@@ -1,5 +1,5 @@
 from entries import input_date , fruit_category , quantity_sold
-from storing import logging , delete_table , undo_entry
+from storing import logging , delete_table 
 import sqlite3
 
 all_fruits = [
@@ -21,38 +21,41 @@ def confirm_entry(entries):
         print(f"{key}: {value}")
     return input("Is this information correct? (Y/N): ").upper() == 'Y'
 
-def undo_last_entry(conn, date, fruit_name):
+def undo_entry(conn):
     cursor = conn.cursor()
+    fruit_name = input("Please enter the fruit_name(table) where the entry is found: ")
+    fruit_name = ''.join(char for char in fruit_name if char.isalnum()).capitalize()  # Basic sanitization
+    entry_id = input("Enter the ID of the entry to delete: ")
 
-    # Query to get all entries for the given fruit and date
-    cursor.execute(f"SELECT id, quantity_kg, quantity_boxes FROM {fruit_name} WHERE  selling_date = ?", (date))
-    entries = cursor.fetchall()
-
-    if not entries:
-        print(f"No entries found for {fruit_name} on {date}.")
+    # Check if the table exists
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (fruit_name,))
+    if not cursor.fetchone():
+        print(f"No such table: {fruit_name}")
         return
 
-    # Display entries
-    print(f"Entries for {fruit_name} on {date}:")
+    # Fetch and display the entry to be deleted
+    select_query = f"SELECT selling_date, quantity_kg, quantity_boxes FROM {fruit_name} WHERE id = ?"
+    cursor.execute(select_query, (entry_id,))
+    entries = cursor.fetchall()
+    if not entries:
+        print(f"No entries found for {fruit_name} with id {entry_id}.")
+        return
+
+    print(f"Entries for {fruit_name} with ID {entry_id}:")
     for entry in entries:
-        print(f"ID: {entry[0]}, Quantity (kg): {entry[1]}, Quantity (boxes): {entry[2]}")
+        print(f"Selling Date: {entry[0]}, Quantity (kg): {entry[1]}, Quantity (boxes): {entry[2]}")
 
-    # Ask for the ID of the entry to delete
-    while True:
-        try:
-            entry_id = int(input("Enter the ID of the entry to delete: "))
-            if any(entry[0] == entry_id for entry in entries):
-                break
-            else:
-                print("Invalid ID. Please enter an ID from the list.")
-        except ValueError:
-            print("Invalid input. Please enter a numerical ID.")
+    # Confirm deletion
+    confirm = input(f"Are you sure you want to delete entry ID {entry_id} from {fruit_name}? (Y/N): ").upper()
+    if confirm != 'Y':
+        print("Deletion cancelled.")
+        return
 
-    # Delete the selected entry
-    delete_query = "DELETE FROM loggings WHERE id = ?"
+    # Delete the entry
+    delete_query = f"DELETE FROM {fruit_name} WHERE id = ?"
     cursor.execute(delete_query, (entry_id,))
     conn.commit()
-    print(f"Entry with ID {entry_id} has been removed.")
+    print(f"Entry with ID {entry_id} has been removed from {fruit_name}.")
 
 
 def forward():
@@ -65,12 +68,15 @@ def forward():
         entries = quantity_sold(date, fruit_name, 'N', dollar_rate)  
         dollar_rate = entries['dollar_rate']
         logging(conn, date, fruit_name, entries)
-
-        # Ask if the user wants to undo the last entry
-        if input('Undo this entry? (Y/N): ').upper() == 'Y':
-            undo_last_entry(conn, date, fruit_name)
-
-        # Repeatedly ask for logging more entries on the same date
+        while True:
+            delete_choice = input("Do you want to delete any entry? (Y/N): ").upper()
+            if delete_choice == 'N':
+                break  # Exit the deletion loop
+            elif delete_choice == 'Y':
+                undo_entry(conn)
+            else:
+                print("Invalid input. Please enter 'Y' for Yes or 'N' for No.")
+        
         while True:
             repeat = input('Log another entry on the SAME DATE? (Y/N): ').upper()
             if repeat == 'N':
@@ -83,8 +89,7 @@ def forward():
 
                 # Ask again for undo after each entry
                 if input('Undo this entry? (Y/N): ').upper() == 'Y':
-                    undo_last_entry(conn, date, fruit_name)
-
+                    undo_entry()
         # Check if the user wants to continue logging for a new date
         if input('Do you want to continue logging for a NEW DATE? (Y/N): ').upper() != 'Y':
             break
