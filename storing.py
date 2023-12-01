@@ -21,7 +21,7 @@ def undo_entry(conn , table_name , entry_id):
     conn.commit()
     
 def delete_table(conn , table_name):
-    
+    table_name = table_name.capitalize()
     cursor = conn.cursor()
     delete = f'''
     DROP TABLE {table_name}
