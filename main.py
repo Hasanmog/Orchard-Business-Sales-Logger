@@ -13,7 +13,7 @@ all_fruits = [
     'Orange Shamoute'
 ]
 
-conn = sqlite3.connect('loggings.db')
+conn = sqlite3.connect('Season23_24.db')
 
 def confirm_entry(entries):
     print("\nPlease review the entered details:")
@@ -58,8 +58,7 @@ def undo_entry(conn):
     print(f"Entry with ID {entry_id} has been removed from {fruit_name}.")
 
 
-def forward():
-    conn = sqlite3.connect('loggings.db')
+def forward(conn):
     dollar_rate = 90000
 
     while True:
@@ -89,7 +88,7 @@ def forward():
 
                 # Ask again for undo after each entry
                 if input('Undo this entry? (Y/N): ').upper() == 'Y':
-                    undo_entry()
+                    undo_entry(conn)
         # Check if the user wants to continue logging for a new date
         if input('Do you want to continue logging for a NEW DATE? (Y/N): ').upper() != 'Y':
             break
@@ -98,4 +97,5 @@ def forward():
     print('Have a nice day :)')
     conn.close()
 
-forward()
+forward(conn)
+

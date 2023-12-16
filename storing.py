@@ -28,6 +28,16 @@ def delete_table(conn , table_name):
     '''
     cursor.execute(delete)
     conn.commit()
+    
+def display_current_sum(conn, fruit_name):
+    cursor = conn.cursor()
+    sum_query = f"SELECT SUM(quantity_kg), SUM(quantity_boxes) FROM {fruit_name}"
+    cursor.execute(sum_query)
+    total_sum = cursor.fetchone()
+
+    print(f"\nCurrent Total for {fruit_name}:")
+    print(f"Total Quantity (kg): {total_sum[0] if total_sum[0] else 0}, Total Quantity (boxes): {total_sum[1] if total_sum[1] else 0}")
+
 
 def logging(conn , selling_date ,fruit_name , entries):   
     #explain arguments ....
