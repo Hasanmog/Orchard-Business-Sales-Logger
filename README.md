@@ -28,3 +28,21 @@ python main.py
 # For converting your logged data to an Excel spreadsheet, run:
 
 python sqlite_to_excel.py
+```
+
+## Future Work and Enhancements
+
+Below is a roadmap of planned features and enhancements for the Orchard Business Sales Logger. Checkmarks indicate completed features, while crosses show work that's still in the pipeline.
+
+| Feature                   | Description                                                               | Completed   |
+|---------------------------|---------------------------------------------------------------------------|-------------|
+| Sales Logging             | Functionality to log daily sales transactions of various fruit categories. | ✔           |
+| Expenses Tracking         | A module to log operational expenses, providing a more complete financial picture. | ✘           |
+| User Interface            | Develop a user-friendly GUI to simplify data entry and management.       | ✘           |
+| Reporting and Analytics   | Enhanced reporting features for better insights into sales trends.       | ✘           |
+| Mobile App                | A mobile application to log sales on the go, directly from the orchard.   | ✘           |
+
+Contributions, feedback, and suggestions are always welcome to help improve this project.
+
+
+
