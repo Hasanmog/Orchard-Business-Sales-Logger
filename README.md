@@ -28,9 +28,3 @@ python main.py
 # For converting your logged data to an Excel spreadsheet, run:
 
 python sqlite_to_excel.py
-
-**
-
-
-
-```
