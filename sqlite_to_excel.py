@@ -6,6 +6,7 @@
 import sqlite3
 import pandas as pd
 
+# some fruits are named according to what they are called in the LEBANESE markets :)
 all_fruits = [
     'Lemon',
     'Avocado',
