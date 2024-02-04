@@ -13,6 +13,7 @@ This repository houses a unique codebase specifically tailored for logging sales
 - `main.py`: This is the heart of our application, tying together the functionalities of entries and storing. It orchestrates the user input process, data storage, and overall flow of the sales logging.
 - `requirements.txt`: A list of Python packages that are required to run this application. Use `pip install -r requirements.txt` to install all dependencies.
 - `sqlite_to_excel.py`: A utility script that converts the logged sales data from the SQLite database to an Excel file, facilitating easy data analysis and reporting.
+- `excel_to_sqlite.py`: A utility script that converts the logged sales data from the Excel file to an SQLite database, facilitating easy data analysis and reporting.
 
 ## Getting Started
 
